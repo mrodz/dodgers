@@ -26,7 +26,7 @@ public class RobotContainer {
     private final DriveWithJoysticks driveWithJoysticks = new DriveWithJoysticks(base, this::getSpeed, this::getTurn);
 
     private double getSpeed() {
-        final double raw = controller.getLeftY() / 3;
+        final double raw = -controller.getLeftY() / 3;
         if (Math.abs(raw) < controllerDeadZone)
             return 0;
         return raw;
