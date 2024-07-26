@@ -1,64 +1,44 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.leftFollow1ID;
-import static frc.robot.Constants.leftFollow2ID;
-import static frc.robot.Constants.leftLeadID;
-import static frc.robot.Constants.rightFollow1ID;
-import static frc.robot.Constants.rightFollow2ID;
-import static frc.robot.Constants.rightLeadID;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.CommandStopAction;
+import frc.robot.StoppableSubsystemBase;
 
-public class Drivebase extends SubsystemBase implements CommandStopAction {
-    private TalonSRX leftLead;
-    private TalonSRX leftFollow1;
-    private TalonSRX leftFollow2;
+import static frc.robot.Constants.*;
 
-    private TalonSRX rightLead;
-    private TalonSRX rightFollow1;
-    private TalonSRX rightFollow2;
+public class DriveBase extends StoppableSubsystemBase {
+  private final TalonSRX leftLead = new TalonSRX(ID.LEFT_LEAD);
+  private final TalonSRX leftFollow1 = new TalonSRX(ID.LEFT_FOLLOW);
+  private final TalonSRX leftFollow2 = new TalonSRX(ID.LEFT_FOLLOW_2);
 
-    public Drivebase() {
-        leftLead = new TalonSRX(leftLeadID);
-        leftFollow1 = new TalonSRX(leftFollow1ID);
-        leftFollow2 = new TalonSRX(leftFollow2ID);
+  private final TalonSRX rightLead = new TalonSRX(ID.RIGHT_LEAD);
+  private final TalonSRX rightFollow1 = new TalonSRX(ID.RIGHT_FOLLOW);
+  private final TalonSRX rightFollow2 = new TalonSRX(ID.RIGHT_FOLLOW_2);
 
-        rightLead = new TalonSRX(rightLeadID);
-        rightFollow1 = new TalonSRX(rightFollow1ID);
-        rightFollow2 = new TalonSRX(rightFollow2ID);
+  public DriveBase() {
+    this.leftFollow1.follow(this.leftLead);
+    this.leftFollow2.follow(this.leftLead);
+    this.rightFollow1.follow(this.rightLead);
+    this.rightFollow2.follow(this.rightLead);
 
-        leftFollow1.follow(leftLead);
-        leftFollow2.follow(leftLead);
-        rightFollow1.follow(rightLead);
-        rightFollow2.follow(rightLead);
+    this.leftFollow1.setInverted(InvertType.FollowMaster);
+    this.leftFollow2.setInverted(InvertType.FollowMaster);
+    this.leftLead.setInverted(true);
+  }
 
-        leftFollow1.setInverted(InvertType.FollowMaster);
-        leftFollow2.setInverted(InvertType.FollowMaster);
-        leftLead.setInverted(true);
-    }
+  public void setRight(double percentOutput) {
+    this.rightLead.set(ControlMode.PercentOutput, percentOutput);
+  }
 
-    public void drive(double left, double right) {
-        leftLead.set(ControlMode.PercentOutput, left);
-        rightLead.set(ControlMode.PercentOutput, right);
-    }
+  public void setLeft(double percentOutput) {
+    this.leftLead.set(ControlMode.PercentOutput, percentOutput);
+  }
 
-    public void setRight(double speed) {
-        rightLead.set(ControlMode.PercentOutput, speed);
-    }
-
-    public void setLeft(double speed) {
-        leftLead.set(ControlMode.PercentOutput, speed);
-    }
-
-    @Override
-    public Command stopAction() {
-        return Commands.run(() -> this.drive(0, 0), this);
-    }
+  @Override
+  public void stop() {
+    this.setLeft(0);
+    this.setRight(0);
+  }
 }
